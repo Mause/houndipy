@@ -1,5 +1,6 @@
 import time
 import hmac
+import json
 from uuid import uuid4
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 
@@ -61,14 +62,16 @@ class Client:
         self._sess = Session()
         self._sess.mount('https://', HoundifyAdapter(client_id, client_key))
 
-    def text(self, query):
+    def text(self, query, **kwargs):
         return self._sess.post(
             'https://api.houndify.com/v1/text',
-            params={'query': query}
+            params={'query': query},
+            headers={'Hound-Request-Info': json.dumps(kwargs)}
         )
 
-    def speech(self, audio):
+    def speech(self, audio, **kwargs):
         return self._sess.post(
             'https://api.houndify.com/v1/audio',
-            data=audio
+            data=audio,
+            headers={'Hound-Request-Info': json.dumps(kwargs)}
         )
