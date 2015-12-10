@@ -4,7 +4,7 @@ import hmac
 import unittest
 from io import BytesIO
 from uuid import uuid4
-from base64 import b64encode, b64decode
+from base64 import urlsafe_b64decode, urlsafe_b64encode
 from contextlib import closing
 
 import wave
@@ -13,14 +13,6 @@ from requests import Session
 from requests.adapters import HTTPAdapter
 
 
-def b64urlencode(*args, **kwargs):
-    val = b64encode(*args, **kwargs)
-    return val.translate(bytes.maketrans(b'+/', b'-_'))
-
-
-def b64urldecode(val, **kwargs):
-    val = val.translate(bytes.maketrans(b'-_', b'+/'))
-    return b64decode(val, **kwargs)
 
 
 class HoundifyAdapter(HTTPAdapter):
@@ -50,14 +42,14 @@ class HoundifyAdapter(HTTPAdapter):
     def _sign_request(self, request_id, timestamp, user_id, client_id,
                       client_key):
         value = '{};{}{}'.format(user_id, request_id, timestamp)
-        clientKeyBuffer = b64urldecode(client_key)
+        clientKeyBuffer = urlsafe_b64decode(client_key)
         q_hmac = hmac.HMAC(
             clientKeyBuffer,
             value.encode('utf8'),
             digestmod='sha256'
         )
         digest = q_hmac.digest()
-        signature = b64urlencode(digest).decode()
+        signature = urlsafe_b64encode(digest).decode()
 
         return {
             'Hound-Request-Authentication': '{};{}'.format(
