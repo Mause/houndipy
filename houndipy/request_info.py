@@ -45,7 +45,7 @@ def validate_request_info(request_info):
             assert schema['valid'](val)
 
         if 'type' in schema:
-            assert isinstance(schema['type'], val)
+            assert isinstance(val, schema['type'])
 
     return request_info
 
