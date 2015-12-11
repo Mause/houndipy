@@ -8,7 +8,7 @@ from requests import Session
 from requests.adapters import HTTPAdapter
 
 
-from request_info import validate_request_info
+from .request_info import validate_request_info
 
 
 class HoundifyAdapter(HTTPAdapter):
