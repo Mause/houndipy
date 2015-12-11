@@ -119,11 +119,15 @@ class Client:
         return Conversation(self)
 
     def _request(self, url, request_info, **kwargs):
-        return self._sess.post(
+        res = self._sess.post(
             url,
             headers={'Hound-Request-Info': json.dumps(request_info)},
             **kwargs
         )
+        data = res.json()
+        if 'ErrorMessage' in data:
+            raise HoundipyException(data['ErrorMessage'])
+        return res
 
     def text(self, query, **kwargs):
         return self._request(
@@ -138,3 +142,7 @@ class Client:
             data=audio,
             request_info=kwargs
         )
+
+
+class HoundipyException(Exception):
+    pass
