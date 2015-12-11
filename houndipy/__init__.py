@@ -20,7 +20,7 @@ class HoundifyAdapter(HTTPAdapter):
         super().__init__()
 
     def send(self, request, **kwargs):
-        self.sign_request(request)
+        request = self.sign_request(request)
 
         # houndify doesn't accept + in place of space charactors
         request.url = request.url.replace('+', '%20')
@@ -52,7 +52,9 @@ class HoundifyAdapter(HTTPAdapter):
             client_key=self.client_key
         )
 
+        request = request.copy()
         request.headers.update(headers)
+        return request
 
     def _sign_request(self, request_id, timestamp, user_id, client_id,
                       client_key):
