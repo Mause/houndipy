@@ -129,9 +129,13 @@ class Client:
             },
             **kwargs
         )
-        data = res.json()
-        if 'ErrorMessage' in data:
-            raise HoundipyException(data['ErrorMessage'])
+        try:
+            data = res.json()
+        except ValueError:
+            pass
+        else:
+            if 'ErrorMessage' in data:
+                raise HoundipyException(data['ErrorMessage'])
         return res
 
     def text(self, query, **kwargs):
