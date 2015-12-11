@@ -58,6 +58,13 @@ class HoundifyAdapter(HTTPAdapter):
 
     def _sign_request(self, request_id, timestamp, user_id, client_id,
                       client_key):
+        '''
+        Performs the actual signing of the request.
+
+        Although not mentioned in the Houndify documentation to the best
+        of my knowledge, the urlsafe version of base64 is required here,
+        along with the sha256 version of HMAC (also left unmentioned).
+        '''
         value = '{};{}{}'.format(user_id, request_id, timestamp)
         clientKeyBuffer = urlsafe_b64decode(client_key)
         q_hmac = hmac.HMAC(
