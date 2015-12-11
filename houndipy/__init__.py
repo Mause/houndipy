@@ -8,6 +8,7 @@ from requests import Session
 from requests.adapters import HTTPAdapter
 
 
+from request_info import validate_request_info
 
 
 class HoundifyAdapter(HTTPAdapter):
@@ -121,7 +122,11 @@ class Client:
     def _request(self, url, request_info, **kwargs):
         res = self._sess.post(
             url,
-            headers={'Hound-Request-Info': json.dumps(request_info)},
+            headers={
+                'Hound-Request-Info': json.dumps(
+                    validate_request_info(request_info)
+                )
+            },
             **kwargs
         )
         data = res.json()
