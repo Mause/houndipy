@@ -22,6 +22,9 @@ class HoundifyAdapter(HTTPAdapter):
     def send(self, request, **kwargs):
         self.sign_request(request)
 
+        # houndify doesn't accept + in place of space charactors
+        request.url = request.url.replace('+', '%20')
+
         if 'Accept-Encoding' in request.headers:
             request.headers['Hound-Response-Accept-Encoding'] = (
                 request.headers['Accept-Encoding']
