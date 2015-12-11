@@ -118,16 +118,23 @@ class Client:
     def converse(self):
         return Conversation(self)
 
-    def text(self, query, **kwargs):
+    def _request(self, url, request_info, **kwargs):
         return self._sess.post(
+            url,
+            headers={'Hound-Request-Info': json.dumps(request_info)},
+            **kwargs
+        )
+
+    def text(self, query, **kwargs):
+        return self._request(
             'https://api.houndify.com/v1/text',
             params={'query': query},
-            headers={'Hound-Request-Info': json.dumps(kwargs)}
+            request_info=kwargs
         )
 
     def speech(self, audio, **kwargs):
-        return self._sess.post(
+        return self._request(
             'https://api.houndify.com/v1/audio',
             data=audio,
-            headers={'Hound-Request-Info': json.dumps(kwargs)}
+            request_info=kwargs
         )
