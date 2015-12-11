@@ -70,11 +70,38 @@ class HoundifyAdapter(HTTPAdapter):
         }
 
 
+class Conversation:
+    def __init__(self, client):
+        self.client = client
+        self.converstation_state = None
+
+    def text(self, *args, **kwargs):
+        kwargs.setdefault('ConversationState', self.converstation_state or {})
+        res = self.client.text(*args, **kwargs)
+        data = res.json()
+        if 'AllResults' in data:
+            self.converstation_state = (
+                data['AllResults'][0]['ConversationState']
+            )
+        return res
+
+    def speech(self, *args, **kwargs):
+        kwargs.setdefault('ConversationState', self.converstation_state or {})
+        res = self.client.text(*args, **kwargs)
+        self.converstation_state = (
+            res.json()['AllResults'][0]['ConversationState']
+        )
+        return res
+
+
 class Client:
 
     def __init__(self, client_id, client_key):
         self._sess = Session()
         self._sess.mount('https://', HoundifyAdapter(client_id, client_key))
+
+    def converse(self):
+        return Conversation(self)
 
     def text(self, query, **kwargs):
         return self._sess.post(
