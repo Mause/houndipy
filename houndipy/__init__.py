@@ -21,7 +21,21 @@ class HoundifyAdapter(HTTPAdapter):
 
     def send(self, request, **kwargs):
         self.sign_request(request)
-        return super().send(request, **kwargs)
+
+        if 'Accept-Encoding' in request.headers:
+            request.headers['Hound-Response-Accept-Encoding'] = (
+                request.headers['Accept-Encoding']
+            )
+
+        response = super().send(request, **kwargs)
+
+        # why does Houndify use non-standard headers?!
+        if 'Hound-Response-Content-Encoding' in response.headers:
+            response.raw.headers['Content-Encoding'] = (
+                response.headers.pop('Hound-Response-Content-Encoding')
+            )
+
+        return response
 
     def sign_request(self, request):
         headers = self._sign_request(
