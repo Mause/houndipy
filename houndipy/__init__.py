@@ -25,6 +25,8 @@ class HoundifyAdapter(HTTPAdapter):
         # houndify doesn't accept + in place of space charactors
         request.url = request.url.replace('+', '%20')
 
+        # we have to translate between what requests uses, and what houdify
+        # uses. i don't understand why Houndify uses non-standard headers
         if 'Accept-Encoding' in request.headers:
             request.headers['Hound-Response-Accept-Encoding'] = (
                 request.headers['Accept-Encoding']
@@ -32,8 +34,9 @@ class HoundifyAdapter(HTTPAdapter):
 
         response = super().send(request, **kwargs)
 
-        # why does Houndify use non-standard headers?!
         if 'Hound-Response-Content-Encoding' in response.headers:
+            # this doesn't work unless we set it on the raw response,
+            # not sure why
             response.raw.headers['Content-Encoding'] = (
                 response.headers.pop('Hound-Response-Content-Encoding')
             )
