@@ -94,19 +94,29 @@ class Conversation:
     def text(self, *args, **kwargs):
         kwargs.setdefault('ConversationState', self.converstation_state or {})
         res = self.client.text(*args, **kwargs)
-        data = res.json()
-        if 'AllResults' in data:
-            self.converstation_state = (
-                data['AllResults'][0]['ConversationState']
-            )
+        try:
+            data = res.json()
+        except ValueError:
+            pass
+        else:
+            if 'AllResults' in data:
+                self.converstation_state = (
+                    data['AllResults'][0]['ConversationState']
+                )
         return res
 
     def speech(self, *args, **kwargs):
         kwargs.setdefault('ConversationState', self.converstation_state or {})
         res = self.client.text(*args, **kwargs)
-        self.converstation_state = (
-            res.json()['AllResults'][0]['ConversationState']
-        )
+        try:
+            data = res.json()
+        except ValueError:
+            pass
+        else:
+            if 'AllResults' in data:
+                self.converstation_state = (
+                    data['AllResults'][0]['ConversationState']
+                )
         return res
 
 
