@@ -91,9 +91,11 @@ class Conversation:
         self.client = client
         self.converstation_state = None
 
-    def text(self, *args, **kwargs):
+    def _conversation_state_request(self, func, *args, **kwargs):
         kwargs.setdefault('ConversationState', self.converstation_state or {})
-        res = self.client.text(*args, **kwargs)
+
+        res = func(*args, **kwargs)
+
         try:
             data = res.json()
         except ValueError:
@@ -105,19 +107,17 @@ class Conversation:
                 )
         return res
 
+    def text(self, *args, **kwargs):
+        return self._conversation_state_request(
+            self.client.text,
+            *args, **kwargs
+        )
+
     def speech(self, *args, **kwargs):
-        kwargs.setdefault('ConversationState', self.converstation_state or {})
-        res = self.client.text(*args, **kwargs)
-        try:
-            data = res.json()
-        except ValueError:
-            pass
-        else:
-            if 'AllResults' in data:
-                self.converstation_state = (
-                    data['AllResults'][0]['ConversationState']
-                )
-        return res
+        return self._conversation_state_request(
+            self.client.speech,
+            *args, **kwargs
+        )
 
 
 class Client:
