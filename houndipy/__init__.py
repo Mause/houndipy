@@ -19,7 +19,7 @@ class HoundifyAdapter(HTTPAdapter):
         self.client_id = client_id
         self.client_key = client_key
 
-        super().__init__()
+        super(HoundifyAdapter, self).__init__()
 
     def send(self, request, **kwargs):
         request = self.sign_request(request)
@@ -34,7 +34,7 @@ class HoundifyAdapter(HTTPAdapter):
                 request.headers['Accept-Encoding']
             )
 
-        response = super().send(request, **kwargs)
+        response = super(HoundifyAdapter, self).send(request, **kwargs)
 
         if 'Hound-Response-Content-Encoding' in response.headers:
             # this doesn't work unless we set it on the raw response,
