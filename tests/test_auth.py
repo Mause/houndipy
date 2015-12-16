@@ -5,6 +5,7 @@ from houndipy import HoundifyAdapter
 class TestClient(unittest.TestCase):
 
     def test_headers(self):
+        # this is example data from the documentation
         res = HoundifyAdapter._sign_request(
             None,
             user_id='ae06fcd3-6447-4356-afaa-813aa4f2ba41',
