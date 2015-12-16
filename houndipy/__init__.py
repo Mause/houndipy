@@ -101,7 +101,7 @@ class Conversation:
         except ValueError:
             pass
         else:
-            if 'AllResults' in data:
+            if 'AllResults' in data and data['AllResults']:
                 self.converstation_state = (
                     data['AllResults'][0]['ConversationState']
                 )
