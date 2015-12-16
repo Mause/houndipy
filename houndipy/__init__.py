@@ -45,7 +45,7 @@ class HoundifyAdapter(HTTPAdapter):
         return response
 
     def sign_request(self, request):
-        headers = self._sign_request(
+        headers = sign_request(
             request_id=uuid4().hex,
             timestamp=int(time.time()),
             user_id=self.user_id,
@@ -57,33 +57,34 @@ class HoundifyAdapter(HTTPAdapter):
         request.headers.update(headers)
         return request
 
-    def _sign_request(self, request_id, timestamp, user_id, client_id,
-                      client_key):
-        '''
-        Performs the actual signing of the request.
 
-        Although not mentioned in the Houndify documentation to the best
-        of my knowledge, the urlsafe version of base64 is required here,
-        along with the sha256 version of HMAC (also left unmentioned).
-        '''
-        value = '{};{}{}'.format(user_id, request_id, timestamp)
-        clientKeyBuffer = urlsafe_b64decode(client_key)
-        q_hmac = hmac.HMAC(
-            clientKeyBuffer,
-            value.encode('utf8'),
-            digestmod='sha256'
+def sign_request(request_id, timestamp, user_id, client_id, client_key):
+    '''
+    Performs the actual signing of the request.
+
+    Although not mentioned in the Houndify documentation to the best
+    of my knowledge, the urlsafe version of base64 is required here,
+    along with the sha256 version of HMAC (also left unmentioned).
+    '''
+    value = '{};{}{}'.format(user_id, request_id, timestamp)
+    clientKeyBuffer = urlsafe_b64decode(client_key)
+    q_hmac = hmac.HMAC(
+        clientKeyBuffer,
+        value.encode('utf8'),
+        digestmod='sha256'
+    )
+    digest = q_hmac.digest()
+    signature = urlsafe_b64encode(digest).decode()
+
+    return {
+        'Hound-Request-Authentication': '{};{}'.format(
+            user_id, request_id
+        ),
+        'Hound-Client-Authentication': '{};{};{}'.format(
+            client_id, timestamp, signature
         )
-        digest = q_hmac.digest()
-        signature = urlsafe_b64encode(digest).decode()
+    }
 
-        return {
-            'Hound-Request-Authentication': '{};{}'.format(
-                user_id, request_id
-            ),
-            'Hound-Client-Authentication': '{};{};{}'.format(
-                client_id, timestamp, signature
-            )
-        }
 
 
 class Conversation:
