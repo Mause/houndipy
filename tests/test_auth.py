@@ -1,13 +1,12 @@
 import unittest
-from houndipy import HoundifyAdapter
+from houndipy import sign_request
 
 
 class TestClient(unittest.TestCase):
 
     def test_headers(self):
         # this is example data from the documentation
-        res = HoundifyAdapter._sign_request(
-            None,
+        res = sign_request(
             user_id='ae06fcd3-6447-4356-afaa-813aa4f2ba41',
             request_id='70aa7c25-c74f-48be-8ca8-cbf73627c05f',
             timestamp=1418068667,
