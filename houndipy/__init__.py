@@ -1,6 +1,7 @@
 import time
 import hmac
 import json
+import hashlib
 from uuid import uuid4
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 
@@ -71,7 +72,7 @@ def sign_request(request_id, timestamp, user_id, client_id, client_key):
     q_hmac = hmac.HMAC(
         clientKeyBuffer,
         value.encode('utf8'),
-        digestmod='sha256'
+        digestmod=hashlib.sha256
     )
     digest = q_hmac.digest()
     signature = urlsafe_b64encode(digest).decode()
