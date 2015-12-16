@@ -16,8 +16,8 @@ class HoundifyAdapter(HTTPAdapter):
 
     def __init__(self, client_id, client_key):
         self.user_id = uuid4().hex
-        self.client_id = client_id
-        self.client_key = client_key
+        self.client_id = str(client_id)
+        self.client_key = str(client_key)
 
         super(HoundifyAdapter, self).__init__()
 
